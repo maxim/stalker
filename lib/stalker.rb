@@ -22,7 +22,7 @@ module Stalker
         self.send(callback, mole)
         establish_channels += <<-end_code 
           def #{mole}
-            #{klass}.send(:#{notify_stalker}, self) if #{klass}.respond_to?(:#{notify_stalker})
+            #{klass}.#{notify_stalker}(self) if #{klass}.respond_to?(:#{notify_stalker})
           end
         end_code
       end
