@@ -7,18 +7,21 @@ module Stalker
     def instance; end
     
     def stalk(*models)
+      options = models.extract_options!
       models.flatten!
       
       models.map do |m|
-        m.add_stalker!(self)
+        m.add_stalker!(self, options)
       end
     end
     
-    def add_stalker!(klass)
+    def add_stalker!(klass, options = {})
+      stalkee = options[:group] || self.name.underscore
       establish_channels = ""
+      
       for callback in ActiveRecord::Callbacks::CALLBACKS
         mole = :"notify_#{klass.to_s.underscore}_#{callback}"
-        notify_stalker = :"#{callback.split('_', 2).join("_#{self.name.underscore}_")}"
+        notify_stalker = :"#{callback.split('_', 2).join("_#{stalkee.downcase}_")}"
         self.send(callback, mole)
         establish_channels += <<-end_code 
           def #{mole}

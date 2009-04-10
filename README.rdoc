@@ -1,6 +1,6 @@
 = Stalker
 
-Rails micro-plugin (35 lines) which allows models to observe each other.
+Rails micro-plugin (38 lines) which allows models to observe each other.
 
 == Install
   
@@ -34,6 +34,27 @@ Now let's see what happens.
 
 == What happened?
 The stalker class (Idiot) now has magical class methods (such as before_[stalked_class]_save(stalked_instance), after_[stalked_class]_validate(stalked_instance), etc) for reacting to stalked class's callbacks. Keep in mind they're class methods, hence the class << self thingie.  As an argument these methods get the reference to the instance of the stalked class. This way you can alter the object or just extract information from it.
+
+== Group your victims!
+If you want to stalk multiple models with same responses, it's easy to do using :group option.
+
+  class Celebrity < ActiveRecord::Base
+  end
+  
+  class Politician < ActiveRecord::Base
+  end
+  
+  class Idiot < ActiveRecord::Base
+    stalk Celebrity, Politician, :group => :victim
+    
+    def self.before_victim_save(victim)
+      if victim.is_a?(Politician)
+        poke(victim)
+      else
+        bite(victim)
+      end
+    end
+  end
 
 == Why?
 Sometimes you want model A to notify model B if something happens to it, so that model B could react. It's useful if it's concern of model B, like it has to update its records. If you have Product model that needs to decrement count of products when Order has been placed, you'd want Order model to notify Product model about the fact that it's been placed. Product can then decrement item count in itself.
