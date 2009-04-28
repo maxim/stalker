@@ -19,7 +19,8 @@ module Stalker
       stalkee = options[:group] || self.name.underscore
       establish_channels = ""
       
-      for callback in ActiveRecord::Callbacks::CALLBACKS
+      exceptions = %w(after_find after_initialize)
+      for callback in (ActiveRecord::Callbacks::CALLBACKS - exceptions)
         mole = :"notify_#{klass.to_s.underscore}_#{callback}"
         notify_stalker = :"#{callback.split('_', 2).join("_#{stalkee.downcase}_")}"
         self.send(callback, mole)
